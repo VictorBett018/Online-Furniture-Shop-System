@@ -22,3 +22,21 @@ class  AllProductsView(TemplateView):
 
 class ProductDetailView(TemplateView):
     template_name = "productdetails.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        url_slug = self.kwargs['slug']
+        product = Product.objects.get(slug=url_slug)
+        context['product'] = product
+        product.view_count +=1
+        product.save()
+        return context
+
+class UserRegisterView(TemplateView):
+    template_name="user_register.html"
+
+class UserLoginView(TemplateView):
+    template_name="user_login.html"
+
+class AddtoCartView(TemplateView):
+    template_name="addtocart.html"

@@ -13,7 +13,6 @@
                         <th>Image</th>
                         <th>Product</th>
                         <th>Rate</th>
-                        <th>Quantity</th>
                         <th>Subtotal</th>
                         <th>Action</th>
                     </tr>
@@ -27,21 +26,30 @@
                     <td><img src="{{cp.product.image.url}}" alt="" width="100" height="100"></td>
                     <td>{{cp.product.title}}</td>
                     <td>{{cp.rate}}</td>
-                    <td>{{cp.quantity}}</td>
                     <td>Ksh {{cp.subtotal}}</td>
                     <td>
-                        <a class="btn btn-primary btn-sm" href=""> + </a>
-                        <a class="btn btn-warning btn-sm" href=""> - </a>
-                        <a class="btn btn-danger btn-sm" href=""> x </a>
+                        <a class="btn btn-primary btn-sm" href="{% url 'furnitureGo:managecart' cp.id %}?action=inc"> + </a>
+                         {{cp.quantity}} 
+                        <a class="btn btn-warning btn-sm" href="{% url 'furnitureGo:managecart' cp.id %}?action=dec"> - </a>
+                        <a class="btn btn-danger btn-sm" href="{% url 'furnitureGo:managecart' cp.id %}?action=rmv"> <i class="bi bi-trash"></i> </a>
                     </td>
 
                   </tr>
 
                 {% endfor %}
                 <tr >
-                    <th colspan="5">Total</th>
+                    <th colspan="4">Total</th>
                     <th>Ksh {{cart.total}}</th>
+                    {% if cart.cartproduct_set.all %}
+                    <th><i class="bi bi-trash3-fill"></i>
+                        <a style="text-decoration: none; color: red;" href="{% url 'furnitureGo:emptycart' %}"> Empty Cart </a></th>
+                    {% endif %}
                 </tr>
+                {% if cart.cartproduct_set.all %}
+                <tr>
+                   <th> <a class="btn btn-info btn-sm" href="{% url 'furnitureGo:checkout' %}"> Checkout </a></th>
+                </tr>
+                {% endif %}
 
                 </tbody>
             </table>

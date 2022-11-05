@@ -1,5 +1,5 @@
-from django.views.generic import TemplateView
-
+from django.views.generic import View, TemplateView
+from django.shortcuts import render, redirect
 from furnitureGo.models import *
 # Create your views here.
 class HomeView(TemplateView):
@@ -82,4 +82,56 @@ class MyCartView(TemplateView):
         else:
             cart = None
         context['cart'] = cart
+        return context
+        
+class ManageCartView(View):
+    def get(self, request, *args, **kwargs):
+        cp_id =self.kwargs["cp_id"]
+        action = request.GET.get("action")
+        cp_obj = CartProduct.objects.get(id = cp_id)
+        cart_obj = cp_obj.cart
+     
+        if action=="inc":
+            cp_obj.quantity += 1
+            cp_obj.subtotal += cp_obj.rate
+            cp_obj.save()
+            cart_obj.total += cp_obj.rate
+            cart_obj.save()
+        elif action=="dec":
+            cp_obj.quantity -= 1
+            cp_obj.subtotal -= cp_obj.rate
+            cp_obj.save()
+            cart_obj.total -= cp_obj.rate
+            cart_obj.save()
+            if cp_obj.quantity == 0:
+                cp_obj.delete()
+        elif action=="rmv":
+            cart_obj.total -= cp_obj.subtotal
+            cart_obj.save()
+            cp_obj.delete()
+        else:
+            pass
+        return redirect("furnitureGo:mycart")
+
+class EmptycartView(View):
+        def get(self, request, *args, **kwargs):
+            cart_id = request.session.get("cart_id", None)
+            if cart_id:
+                cart = Cart.objects.get(id = cart_id)
+                cart.cartproduct_set.all().delete()
+                cart.total = 0
+                cart.save()
+
+            return redirect("furnitureGo:mycart")
+
+class CheckoutView(TemplateView):
+    template_name = "checkout.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cart_id =self.request.session.get("cart_id",None)
+        if cart_id:
+            cart_obj = Cart.objects.get(id = cart_id)
+        else:
+            cart_obj = None
+        context['cart'] = cart_obj
         return context

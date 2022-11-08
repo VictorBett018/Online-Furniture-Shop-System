@@ -1,7 +1,23 @@
 {% extends 'base.html' %}
 {% block title %} Sign Up {% endblock %}
 {% block content %}
+<style>
+    .errorlist{
+        color: red;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <h3>Customer Sign up</h3>
+            <form action="" method="post">
+                {% csrf_token %}
+                {{form.as_p}}
+                <button class="btn btn-primary btn-sm">Submit</button>
+            </form>
 
-
+        </div>
+    </div>
+</div>
 
 {% endblock %}

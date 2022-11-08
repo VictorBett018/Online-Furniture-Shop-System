@@ -1,5 +1,8 @@
-from django.views.generic import View, TemplateView
+from django.views.generic import View, TemplateView ,CreateView, FormView
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
+from .forms import CheckoutForm, UserRegistrationForm ,UserLoginForm
+from django.urls import reverse_lazy
 from furnitureGo.models import *
 # Create your views here.
 class HomeView(TemplateView):
@@ -30,11 +33,42 @@ class ProductDetailView(TemplateView):
         product.save()
         return context
 
-class UserRegisterView(TemplateView):
+class UserRegisterView(CreateView):
     template_name="user_register.html"
+    form_class = UserRegistrationForm
+    success_url = reverse_lazy("furnitureGo:home")
 
-class UserLoginView(TemplateView):
+    def form_valid(self, form):
+        username = form.cleaned_data.get("username")
+        password = form.cleaned_data.get("password")
+        email = form.cleaned_data.get("email")
+        user = User.objects.create_user(username, email, password)
+        form.instance.user = user
+        login(self.request, user)
+
+        return super().form_valid(form)
+
+class UserLoginView(FormView):
     template_name="user_login.html"
+    form_class = UserLoginForm
+    success_url = reverse_lazy("furnitureGo:home")
+
+    def form_valid(self, form):
+        uname = form.cleaned_data.get("username")
+        pwd = form.cleaned_data.get("password")
+        user = authenticate(username = uname, password = pwd)
+        if user is not None and user.customer:
+            login(self.request, user)
+        else:
+            return render(self.request, self.template_name, {"form": self.form_class, "error": "Invalid credentials"})
+
+        return super().form_valid(form)
+
+
+class UserLogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect("furnitureGo:home")
 
 class AddtoCartView(TemplateView):
     template_name="addtocart.html"
@@ -124,8 +158,11 @@ class EmptycartView(View):
 
             return redirect("furnitureGo:mycart")
 
-class CheckoutView(TemplateView):
+class CheckoutView(CreateView):
     template_name = "checkout.html"
+    form_class = CheckoutForm
+    success_url = reverse_lazy("furnitureGo:home")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         cart_id =self.request.session.get("cart_id",None)
@@ -135,3 +172,19 @@ class CheckoutView(TemplateView):
             cart_obj = None
         context['cart'] = cart_obj
         return context
+
+    def form_valid(self, form):
+        cart_id = self.request.session.get("cart_id")
+        if cart_id:
+            cart_obj = Cart.objects.get(id = cart_id)
+            form.instance.cart = cart_obj
+            form.instance.subtotal =cart_obj.total
+            form.instance.discount = 0
+            form.instance.total = cart_obj.total
+            form.instance.order_status = "Order Received"
+            del self.request.session["cart_id"]
+
+        else:
+            return redirect("furnitureGo:home")
+
+        return super().form_valid(form)

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %} Profile {% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Detail information</h3>
+            <p><b><span>Name:</span></b>{{customer.full_name}}</p>
+            <p><b><span>Username:</span></b>{{customer.user.username}}</p>
+            <p><b><span>Email:</span></b>{{customer.user.email}}</p>
+            <p><b><span>Address:</span></b>{{customer.address}}</p>
+            <p><b><span>Joined on:</span></b>{{customer.joined_on}}</p>
+
+        </div>
+        <div class="col-md-6">
+            <h3>Previous Orders</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>SN</th>
+                        <th>Order ID</th>
+                        <th>Amount</th>
+                        <th>Ordered on</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   {% for ord in orders %} 
+
+                   <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>#Order_{{ ord.id}}</td>
+                    <td>{{ ord.total}}</td>
+                    <td>{{ ord.created_at|timesince}} ago</td>
+                    <td>{{ ord.order_status}}</td>
+                   </tr>
+                   {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

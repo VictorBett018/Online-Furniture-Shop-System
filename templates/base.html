@@ -17,6 +17,7 @@
 
     {% if request.user.customer %}
     Welcome {{request.user.username}}
+    <a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:userprofile' %}">My Profile</a>
     <a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:logout' %}">Logout</a>
 
     {% else %}

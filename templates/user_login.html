@@ -18,7 +18,7 @@
                 <li style="color: red;">{{error}}</li>
                 {% endif %}
             </form>
-
+<p>Dont have an account? <a style="text-decoration: none;" href="{% url 'furnitureGo:user_register' %}{% if request.get.next %}?next={{request.GET.next}}{% endif %}">Register</a></p>
         </div>
     </div>
 </div>

@@ -264,7 +264,7 @@ class AdminRequiredMixin(object):
             return redirect("/admin-login/")
         return super().dispatch(request, *args, **kwargs)
 
-class AdminLoginView(AdminRequiredMixin, FormView):
+class AdminLoginView(FormView):
     template_name = "adminpages/admin_login.html"
     form_class = AdminLoginForm
     success_url = reverse_lazy("furnitureGo:admin_home")
@@ -295,11 +295,26 @@ class AdminOrderView(AdminRequiredMixin, DetailView):
     model = Order
     context_object_name = "ord_obj"
 
+    def get_context_data(self, **kwargs):
+        context =super().get_context_data(**kwargs)
+        context["allstatus"] = ORDER_STATUS
+
+        return context
+
 
 class AdminOrderListView(AdminRequiredMixin, ListView):
     template_name = "adminpages/adminorderlist.html"
     queryset = Order.objects.all().order_by("-id")
     context_object_name = "allorders"
+
+class AdminChangeOrderStatusView(AdminRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        order_id = self.kwargs["pk"]
+        order_obj = Order.objects.get(id = order_id)
+        new_status = request.POST.get("status")
+        order_obj.order_status = new_status
+        order_obj.save()
+        return redirect(reverse_lazy("furnitureGo:adminorderdetails", kwargs={"pk":order_id }))
 
 
     

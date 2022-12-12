@@ -1,11 +1,10 @@
-{% extends 'base.html' %}
-{% block title %} Profile {% endblock %}
-{% block content %}
+{% extends 'adminpages/admin_base.html' %}
+{% block title %} Order Detail {% endblock %}
 {% load humanize %}
-
+{% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-md-8 mx auto">
+        <div class="col-md-8 mx-auto">
             <h3>Order Details</h3>
             <p><span>Order ID:</span> #Order_{{ord_obj.id}}</p>
             <p><span>Order Status: </span> {{ord_obj.order_status}}</p>
@@ -41,7 +40,6 @@
                    </tr>
                 </tbody>
             </table>
-
 
         </div>
     </div>

@@ -11,22 +11,19 @@
 <div class="container">
 <body>
 
-    <a href="{% url 'furnitureGo:home' %}">Home</a>|
-    <a href="{% url 'furnitureGo:allproducts' %}">Categories</a>|
-    <a href="{% url 'furnitureGo:mycart' %}">View Cart </a>|
+    <a href="{% url 'furnitureGo:admin_home' %}">Home</a> |
+    <a href="{% url 'furnitureGo:adminorderlist' %}">All Orders</a> |
+    <a target="_blank" href="{% url 'furnitureGo:home' %}">Visit site</a>
+    
 
-    {% if request.user.customer %}
-    Welcome {{request.user.username}}
-    <a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:userprofile' %}">My Profile</a>
+    {% if request.user.admin %}
     <a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:logout' %}">Logout</a>
-
+    
     {% else %}
-    <a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:user_login' %}">Login</a>
-    <a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:admin_login' %}">Admin Login</a>
-I
-    <a style="float: right;" href="{% url 'furnitureGo:user_register' %}">Sign Up</a>
+    <a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:admin_login' %}">Login</a>
+
     {% endif %}
-    <hr></div>
+    
     {% block content %}
     {% endblock %}
 </body>

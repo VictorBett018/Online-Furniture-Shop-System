@@ -1,7 +1,7 @@
-from django.views.generic import View, TemplateView ,CreateView, FormView, DetailView
+from django.views.generic import View, TemplateView ,CreateView, FormView, DetailView, ListView
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
-from .forms import CheckoutForm, UserRegistrationForm ,UserLoginForm
+from .forms import CheckoutForm, UserRegistrationForm ,UserLoginForm, AdminLoginForm
 from django.urls import reverse_lazy
 from furnitureGo.models import *
 # Create your views here.
@@ -76,7 +76,7 @@ class UserLoginView(FormView):
         uname = form.cleaned_data.get("username")
         pwd = form.cleaned_data.get("password")
         user = authenticate(username = uname, password = pwd)
-        if user is not None and user.customer:
+        if user is not None and Customer.objects.filter(user=user).exists():
             login(self.request, user)
         else:
             return render(self.request, self.template_name, {"form": self.form_class, "error": "Invalid credentials"})
@@ -228,7 +228,7 @@ class UserProfileView(TemplateView):
 
     template_name = "userprofile.html"
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and request.user.customer:
+        if request.user.is_authenticated and Customer.objects.filter(user=request.user).exists():
             pass
         else:
             return redirect("/login/?next=/profile/")
@@ -246,11 +246,61 @@ class OrderDetailView(DetailView):
     model = Order
     context_object_name = "ord_obj"
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated and request.user.customer:
-            pass
+        if request.user.is_authenticated and Customer.objects.filter(user=request.user).exists():
+            order_id = self.kwargs["pk"]
+            order = Order.objects.get(id = order_id)
+            if request.user.customer != order.cart.customer:
+              return redirect("/profile/") 
         else:
             return redirect("/login/?next=/profile/")
         return super().dispatch(request, *args, **kwargs)
 
+##admin pages
+class AdminRequiredMixin(object):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and Admin.objects.filter(user=request.user).exists():
+            pass
+        else:
+            return redirect("/admin-login/")
+        return super().dispatch(request, *args, **kwargs)
+
+class AdminLoginView(AdminRequiredMixin, FormView):
+    template_name = "adminpages/admin_login.html"
+    form_class = AdminLoginForm
+    success_url = reverse_lazy("furnitureGo:admin_home")
+
+    def form_valid(self, form):
+        uname = form.cleaned_data.get("username")
+        pwd = form.cleaned_data.get("password")
+        user = authenticate(username = uname, password = pwd)
+        if user is not None and Admin.objects.filter(user=user).exists():
+            login(self.request, user)
+        else:
+            return render(self.request, self.template_name, {"form": self.form_class, "error": "Invalid credentials"})
+ 
+        return super().form_valid(form)
+
+class AdminHomeView(AdminRequiredMixin, TemplateView):
+    template_name =  "adminpages/admin_home.html"
 
 
+    def get_context_data(self, **kwargs):
+        context =super().get_context_data(**kwargs)
+        context["pendingorders"] = Order.objects.filter(order_status = "Order Received").order_by("-id")
+
+        return context
+
+class AdminOrderView(AdminRequiredMixin, DetailView):
+    template_name = "adminpages/adminorderdetails.html"
+    model = Order
+    context_object_name = "ord_obj"
+
+
+class AdminOrderListView(AdminRequiredMixin, ListView):
+    template_name = "adminpages/adminorderlist.html"
+    queryset = Order.objects.all().order_by("-id")
+    context_object_name = "allorders"
+
+
+    
+    

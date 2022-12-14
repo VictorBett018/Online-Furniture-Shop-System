@@ -8,7 +8,7 @@
 
 {% for p in product_list %}
 <div class="col-md-4">
- <h4><a style="text-decoration:none; color: white;" href="{% url 'furnitureGo:productdetails' p.slug %}">{{p.title}}</a></h4>
+ <h4><a style="text-decoration:none;" href="{% url 'furnitureGo:productdetails' p.slug %}">{{p.title}}</a></h4>
 <img src="{{p.image.url}}" alt="" width="300" height="180">
 <p class="mt-3">Price: <strike>Ksh. {{p.marked_price}}</strike> Ksh. {{p.selling_price}}</p>
 <a class="btn btn" style="background-color: #ff7200;" href="{% url 'furnitureGo:addtocart' p.id %}">Add to Cart</a>

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 </head>
-<div class="main">
+
 
 <div class="container">
 <body>
@@ -22,12 +22,11 @@
         </div>
         <div class="menu">
           <ul>
-            <li><a style="float: left;" href="{% url 'furnitureGo:home' %}">HOME</a></li>
+            <li><a style="float: left;" href="{% url 'furnitureGo:home' %}">Home</a></li>
             <li><a href="{% url 'furnitureGo:allproducts' %}">Categories</a></li>
             <li><a href="{% url 'furnitureGo:mycart' %}">View Cart</a></li>
             {% if request.user.customer %}
-    Welcome {{request.user.username}}
-            <li><a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:userprofile' %}">My Profile</a></li>
+            <li><a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:userprofile' %}">{{request.user.username}}</a></li>
             <li><a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:logout' %}">Logout</a></li>
             {% else %}
             <li><a style="float: right; padding-left: 10px;" href="{% url 'furnitureGo:user_login' %}">Login</a></li>
@@ -35,18 +34,9 @@
             <li><a style="float: right;" href="{% url 'furnitureGo:user_register' %}">Sign Up</a></li>
           </ul>
         </div>
-      </div>
-
-
-    
-    
-    
-
-    
-    
-    
     {% endif %}
-    <hr></div>
+    </div>
+    <hr>
     {% block content %}
     {% endblock %}
 </div>
